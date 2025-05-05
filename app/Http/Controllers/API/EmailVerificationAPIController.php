@@ -12,9 +12,10 @@ class EmailVerificationAPIController extends Controller
 {
     use HasResponseTrait;
 
-    public function verifyEmailLink(EmailVerificationRequest $request): JsonResponse
+    public function verifyEmailLink(EmailVerificationRequest $request)/*: JsonResponse*/
     {
         $request->fulfill();
+        return "Hello folks";
         return $this->successResponse("Email successfully verified.");
     }
 

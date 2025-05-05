@@ -22,8 +22,6 @@ trait HasResponseTrait
     public function failedResponse($message, array $data = [], int $status_code = 400): JsonResponse
     {
         $response = [
-            'status' => config('constants.status.failed'),
-            'code' => config('constants.code.failed'),
             'message' => $message
         ];
 
@@ -44,8 +42,6 @@ trait HasResponseTrait
     public function successResponse($message, array $data = [], int $status_code = 200): JsonResponse
     {
         $response = [
-            'status' => config('constants.status.success'),
-            'code' => config('constants.code.success'),
             'message' => $message
         ];
 
@@ -66,11 +62,9 @@ trait HasResponseTrait
      *
      * @return JsonResponse
      */
-    public function successResponseWithResource(string $message, array $data, int $status_code = 200): JsonResponse
+    public function successResponseWithResource(string $message, mixed $data, int $status_code = 200): JsonResponse
     {
         $response = [
-            'status' => config('constants.status.success'),
-            'code' => config('constants.code.success'),
             'message' => $message
         ];
 

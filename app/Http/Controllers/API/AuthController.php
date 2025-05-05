@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         $user->sendEmailVerificationNotification();
 
-        return $this->successResponse("Registration Successful, verification email has been sent to the registered email", [], 201);
+        return $this->successResponse("Registration Successful, Please log in to continue", [], 201);
 
     }
 
@@ -50,10 +50,10 @@ class AuthController extends Controller
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages(['email' => ['The provided credentials are incorrect.']]);
         }
-
+/*
         if (! $user->hasVerifiedEmail()) {
             return $this->failedResponse("Failed Login", ['error' => 'Email not verified.'], 403);
-        }
+        }*/
 
 
         $token = $user->createToken('api-token')->plainTextToken;
