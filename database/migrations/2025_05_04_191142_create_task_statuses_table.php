@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('task_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->boolean('is_active');
+            $table->string('badge_colour');
+            $table->boolean('final_step');
             $table->timestamps();
         });
     }

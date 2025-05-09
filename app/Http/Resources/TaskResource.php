@@ -8,6 +8,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TaskResource extends JsonResource
 {
+
+    public static $wrap = null;
     /**
      * Transform the resource into an array.
      *
@@ -20,7 +22,10 @@ class TaskResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'due_date'  => Carbon::parse($this->due_date)->format('d F Y'),
-            'status'    => $this->taskstatus->name
+            'status'    => $this->taskstatus->name,
+            'task_status_id' => $this->task_status_id,
+            'status_badge_colour' => $this->taskstatus->badge_colour,
+            'created_at'        => Carbon::parse($this->created_at)->format('d F Y')
         ];
     }
 }

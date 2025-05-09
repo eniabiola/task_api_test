@@ -19,7 +19,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email:rfc,dns|unique:users',
             'password' => 'required|min:6|confirmed',
         ]);
 
@@ -40,6 +40,8 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
+        logger(print_r($request->all(), 1));
+
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -50,10 +52,6 @@ class AuthController extends Controller
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages(['email' => ['The provided credentials are incorrect.']]);
         }
-/*
-        if (! $user->hasVerifiedEmail()) {
-            return $this->failedResponse("Failed Login", ['error' => 'Email not verified.'], 403);
-        }*/
 
 
         $token = $user->createToken('api-token')->plainTextToken;
@@ -62,6 +60,8 @@ class AuthController extends Controller
             'user' => new UserResource($user),
             'token' => $token,
         ];
+        logger(print_r($data, 1));
+
 
         return $this->successResponse("Login Successful", $data, 200);
     }

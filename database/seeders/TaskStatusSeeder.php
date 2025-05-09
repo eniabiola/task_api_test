@@ -15,9 +15,10 @@ class TaskStatusSeeder extends Seeder
     {
 
         DB::table('task_statuses')->insert([
-            ['name' => 'pending', 'is_active' => true],
-            ['name' => 'in progress', 'is_active' => true],
-            ['name' => 'completed', 'is_active' => true],
+            ['name' => 'pending', 'final_step' => false, 'badge_colour' => 'bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold'],
+            ['name' => 'in progress', 'final_step' => false, 'badge_colour' => 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold'],
+            ['name' => 'completed', 'final_step' => false, 'badge_colour' => 'bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold'],
+            ['name' => 'cancelled', 'final_step' => true, 'badge_colour' => 'bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold'],
         ]);
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
 use App\Traits\HasResponseTrait;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Task;
@@ -17,9 +18,23 @@ class TaskAPIController extends Controller
 {
     use HasResponseTrait;
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $tasks = Task::query()->orderByDesc('created_at')->paginate(10);
+
+        $validSortColumns = ['task_status_id', 'due_date', 'created_at'];
+        $sortBy = $request->query('sort_by', 'created_at');
+        $direction  = $request->query('order', 'desc');
+
+        // Validate inputs
+        if (!in_array($sortBy, $validSortColumns)) {
+            $sortBy = 'created_at';
+        }
+
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $tasks = Task::query()->orderBy($sortBy, $direction)->paginate(5);
         return $this->successResponseWithResource("Tasks Lists",  TaskResource::collection($tasks)->response()->getData());
     }
 
@@ -33,13 +48,17 @@ class TaskAPIController extends Controller
     }
     public function store(Request $request): JsonResponse
     {
+        logger(print_r($request->all(), true));
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'task_status_id' => 'required|exists:task_statuses,id',
-            'due_date' => 'required|date|after:now',
+            'due_date' => 'required|date_format:Y-m-d\TH:i|after:now',
+        ], [
+            'due_date.date_format' => "Date format must be m/d/Y, h:i A such as 01/31/2050 01:01 AM"
         ]);
         $data['user_id'] = Auth::id();
+        $data['due_date'] = Carbon::parse(strtotime($request->input('due_date')))->format('Y-m-d H:i:s');
 
         $task = Task::create($data);
         return $this->successResponseWithResource("Task creation successful", new TaskResource($task), 201);
@@ -74,13 +93,13 @@ class TaskAPIController extends Controller
         }
 
         $request->validate([
-            'task_status_id' => ['required|exists:task_statuses,id'],
+            'task_status_id' => 'required|exists:task_statuses,id',
         ]);
 
-        $task->track_status_id = $request->track_status_id;
+        $task->task_status_id = $request->task_status_id;
         $task->save();
 
-        return $this->successResponseWithResource("task status updated successfully", new TaskResource($task), 204);
+        return $this->successResponseWithResource("task status updated successfully", new TaskResource($task), 200);
     }
 
     public function destroy($id): JsonResponse

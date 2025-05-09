@@ -8,6 +8,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class TaskCollection extends ResourceCollection
 {
+    public static $wrap = null;
+
     /**
      * Transform the resource collection into an array.
      *
@@ -16,7 +18,7 @@ class TaskCollection extends ResourceCollection
     public function toArray(Request $request): array
     {
         return [
-            'data' => $this->collection->transform(function ($task) {
+            $this->collection->transform(function ($task) {
                 return [
                     'id' => $task->id,
                     'title' => $task->title,
