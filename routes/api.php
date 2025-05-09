@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\EmailVerificationAPIController;
 use App\Http\Controllers\API\TaskAPIController;
 use App\Http\Controllers\API\TaskStatusAPIController;
+use App\Http\Controllers\API\TaskStatusHistoryAPIController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,10 +31,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('{id}', [TaskAPIController::class, 'destroy']);
     });
     Route::prefix('task-statuses')->group(function () {
-        Route::post('/', [TaskStatusAPIController::class, 'store']);
         Route::get('/', [TaskStatusAPIController::class, 'index']);
-        Route::get('{id}', [TaskStatusAPIController::class, 'show']);
-        Route::put('{id}/status', [TaskStatusAPIController::class, 'update']);
-        Route::delete('{id}', [TaskStatusAPIController::class, 'destroy']);
+    });
+    Route::prefix('task-status-histories/{taskId}')->group(function () {
+        Route::get('/', [TaskStatusHistoryAPIController::class, 'index']);
     });
 });

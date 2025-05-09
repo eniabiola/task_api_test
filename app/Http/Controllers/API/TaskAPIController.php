@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
+use App\Models\TaskStatusHistory;
 use App\Traits\HasResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +35,9 @@ class TaskAPIController extends Controller
             $direction = 'asc';
         }
 
-        $tasks = Task::query()->orderBy($sortBy, $direction)->paginate(5);
+        $tasks = Task::query()
+            ->where('user_id', auth()->id())
+            ->orderBy($sortBy, $direction)->paginate(10);
         return $this->successResponseWithResource("Tasks Lists",  TaskResource::collection($tasks)->response()->getData());
     }
 
@@ -85,12 +88,15 @@ class TaskAPIController extends Controller
     }
 
 
-    public function updateStatus(Request $request, $id): JsonResponse
+    public function updateStatus(Request $request, $id)/*: JsonResponse*/
     {
+        logger(print_r($request->all(), 1));
         $task = Task::query()->find($id);
         if (!$task) {
             return $this->failedResponse("Invalid request",['error' => 'Task not found'], 404);
         }
+
+        $previous_status = $task->task_status_id;
 
         $request->validate([
             'task_status_id' => 'required|exists:task_statuses,id',
@@ -98,6 +104,13 @@ class TaskAPIController extends Controller
 
         $task->task_status_id = $request->task_status_id;
         $task->save();
+
+        TaskStatusHistory::query()->create([
+           'task_id' => $task->id,
+           'old_status_id' => $previous_status,
+           'new_status_id' => $request->input('task_status_id'),
+           'changed_at'    => now()
+        ]);
 
         return $this->successResponseWithResource("task status updated successfully", new TaskResource($task), 200);
     }
