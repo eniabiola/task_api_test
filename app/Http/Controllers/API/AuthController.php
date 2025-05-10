@@ -23,13 +23,11 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
-
-        $user->sendEmailVerificationNotification();
 
         return $this->successResponse("Registration Successful, Please log in to continue", [], 201);
 
@@ -60,8 +58,6 @@ class AuthController extends Controller
             'user' => new UserResource($user),
             'token' => $token,
         ];
-        logger(print_r($data, 1));
-
 
         return $this->successResponse("Login Successful", $data, 200);
     }
@@ -69,7 +65,7 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
-        return $this->successResponse("Logged out successfully");
+        return $this->successResponse("Logged out successfully", [], 204);
     }
 
 }

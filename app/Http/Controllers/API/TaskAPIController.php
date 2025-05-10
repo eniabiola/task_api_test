@@ -43,7 +43,9 @@ class TaskAPIController extends Controller
 
     public function show($id): JsonResponse
     {
-        $task = Task::query()->find($id);
+        $task = Task::query()
+            ->where('user_id', \auth()->id())
+            ->find($id);
         if (!$task) {
             return $this->failedResponse("Invalid Request", ['error' => 'Task not found'], 404);
         }
@@ -51,14 +53,13 @@ class TaskAPIController extends Controller
     }
     public function store(Request $request): JsonResponse
     {
-        logger(print_r($request->all(), true));
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'task_status_id' => 'required|exists:task_statuses,id',
             'due_date' => 'required|date_format:Y-m-d\TH:i|after:now',
         ], [
-            'due_date.date_format' => "Date format must be m/d/Y, h:i A such as 01/31/2050 01:01 AM"
+            'due_date.date_format' => "Date format must be Y-m-d\TH:i such as 01/31/2050 01:01 AM"
         ]);
         $data['user_id'] = Auth::id();
         $data['due_date'] = Carbon::parse(strtotime($request->input('due_date')))->format('Y-m-d H:i:s');
@@ -90,8 +91,7 @@ class TaskAPIController extends Controller
 
     public function updateStatus(Request $request, $id)/*: JsonResponse*/
     {
-        logger(print_r($request->all(), 1));
-        $task = Task::query()->find($id);
+        $task = Task::query()->where('user_id', auth()->id())->find($id);
         if (!$task) {
             return $this->failedResponse("Invalid request",['error' => 'Task not found'], 404);
         }
@@ -117,11 +117,11 @@ class TaskAPIController extends Controller
 
     public function destroy($id): JsonResponse
     {
-        $task = Task::find($id);
+        $task = Task::query()->where('user_id', auth()->id())->find($id);
         if (!$task) {
             return $this->failedResponse("Invalid Request", ['error' => 'Task not found'], 404);
         }
         $task->delete();
-        return $this->successResponse('Task deleted successfully');
+        return $this->successResponse('Task deleted successfully', [], 204);
     }
 }

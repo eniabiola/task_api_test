@@ -13,12 +13,6 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/email/verify/{id}/{hash}', [EmailVerificationAPIController::class, 'verifyEmailLink'])
-    ->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
-
-// Resend verification email
-Route::post('/email/verification-notification', [EmailVerificationAPIController::class, 'resendVerificationEmail'])
-    ->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
