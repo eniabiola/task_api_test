@@ -12,8 +12,12 @@ use Illuminate\Http\Request;
 class TaskStatusHistoryAPIController extends Controller
 {
     use HasResponseTrait;
+
+
     /**
-     * Display a listing of the resource.
+     * @param Request $request
+     * @param $taskId
+     * @return JsonResponse
      */
     public function index(Request $request, $taskId): JsonResponse
     {

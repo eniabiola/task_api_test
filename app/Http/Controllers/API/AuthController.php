@@ -15,6 +15,10 @@ class AuthController extends Controller
 {
     use HasResponseTrait;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function register(Request $request): JsonResponse
     {
         $request->validate([
@@ -34,6 +38,8 @@ class AuthController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
      * @throws ValidationException
      */
     public function login(Request $request): JsonResponse
@@ -62,6 +68,10 @@ class AuthController extends Controller
         return $this->successResponse("Login Successful", $data, 200);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

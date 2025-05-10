@@ -15,10 +15,15 @@ use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+
 class TaskAPIController extends Controller
 {
     use HasResponseTrait;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request): JsonResponse
     {
 
@@ -41,6 +46,10 @@ class TaskAPIController extends Controller
         return $this->successResponseWithResource("Tasks Lists",  TaskResource::collection($tasks)->response()->getData());
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function show($id): JsonResponse
     {
         $task = Task::query()
@@ -51,6 +60,11 @@ class TaskAPIController extends Controller
         }
         return $this->successResponseWithResource("Task returned", new TaskResource($task), 200);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -68,6 +82,11 @@ class TaskAPIController extends Controller
         return $this->successResponseWithResource("Task creation successful", new TaskResource($task), 201);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function update(Request $request, $id): JsonResponse
     {
         $task = Task::query()->find($id);
@@ -89,7 +108,12 @@ class TaskAPIController extends Controller
     }
 
 
-    public function updateStatus(Request $request, $id)/*: JsonResponse*/
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function updateStatus(Request $request, $id): JsonResponse
     {
         $task = Task::query()->where('user_id', auth()->id())->find($id);
         if (!$task) {
@@ -115,6 +139,10 @@ class TaskAPIController extends Controller
         return $this->successResponseWithResource("task status updated successfully", new TaskResource($task), 200);
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function destroy($id): JsonResponse
     {
         $task = Task::query()->where('user_id', auth()->id())->find($id);
